@@ -35,7 +35,10 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     wristPID = wrist.getPIDController();
     wristPID.setP(0.3);
-    wristPID.setOutputRange(-0.4, 0.5);
+    wristPID.setI(0.0);
+    wristPID.setD(0.0);
+    wristPID.setIZone(0.0);
+    wristPID.setOutputRange(-0.4, 0.4);
   }
 
   @Override
