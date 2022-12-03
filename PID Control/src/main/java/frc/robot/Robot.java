@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -18,8 +20,11 @@ import edu.wpi.first.wpilibj.XboxController;
  */
 public class Robot extends TimedRobot {
   
+  double WRIST_POSITION_1 = 1.0/6.0 * 128; //These numbers is arbitrary.
+  double WRIST_POSITION_2 = 1.0/9.0 * 128;
+
   CANSparkMax wrist = new CANSparkMax(16, MotorType.kBrushless);
-  CANSparkMax intake = new CANSparkMax(15, MotorType.kBrushless);
+  SparkMaxPIDController wristPID;
   XboxController controller = new XboxController(0);
   
   /**
@@ -27,26 +32,19 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   @Override
-  public void robotInit() {}
+  public void robotInit() {
+    wristPID = wrist.getPIDController();
+    wristPID.setP(0.3);
+    wristPID.setOutputRange(-0.4, 0.5);
+  }
 
   @Override
   public void teleopPeriodic() {
-
-    //This allows you to manually control the wrist movement using the left joystick.
-    double wristSpeed = controller.getLeftY();
-    wrist.set(wristSpeed);
-
-    boolean intakeBalls = controller.getRightBumper();
-    boolean outtakeBalls = controller.getLeftBumper();
-
-    if(intakeBalls) {
-      intake.set(-0.5); // A negative number just tells the motor to go backwards at that speed.
-    } else if(outtakeBalls) {
-      intake.set(0.5);
-    }else {
-      intake.set(0);
+    if(controller.getAButton()){
+      wristPID.setReference(WRIST_POSITION_1, ControlType.kPosition);
+    }else if(controller.getBButton()) {
+      wristPID.setReference(WRIST_POSITION_2, ControlType.kPosition);
     }
-
   }
 
 }
